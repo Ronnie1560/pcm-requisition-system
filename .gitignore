@@ -55,3 +55,9 @@ coverage/
 
 # Misc
 *.tsbuildinfo
+
+# Test scripts with credentials
+test-*.ps1
+test-*.sh
+*.test.ps1
+*.test.sh
