@@ -47,6 +47,22 @@ git commit -m "Your commit message"
 git push
 ```
 
+### Vercel Configuration
+
+The project uses a custom [vercel.json](vercel.json) configuration to:
+- Build from the `client` directory
+- Output to `client/dist`
+- Use Vite as the build tool
+
+### Environment Variables
+
+Required environment variables in Vercel:
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_ANON_KEY` - Your Supabase anon/public key
+
+Required secrets in Supabase Edge Functions:
+- `RESEND_API_KEY` - Your Resend API key for email notifications
+
 ## Repository
 
 https://github.com/Ronnie1560/pcm-requisition-system
