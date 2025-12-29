@@ -5,6 +5,7 @@ import { getCurrentUserProfile, updateUserProfile, changePassword, updateUserEma
 import { getAllProjects } from '../../services/api/projects'
 import { getAllExpenseAccounts } from '../../services/api/expenseAccounts'
 import { logger } from '../../utils/logger'
+import { Edit2 } from 'lucide-react'
 import EmailNotificationSettings from '../../components/settings/EmailNotificationSettings'
 import ExportSchedulerSettings from '../../components/settings/ExportSchedulerSettings'
 
@@ -17,9 +18,19 @@ export default function UserSettings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
 
   // Profile form
   const [profileData, setProfileData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    department: '',
+    employee_id: ''
+  })
+
+  // Store original data for cancel functionality
+  const [originalProfileData, setOriginalProfileData] = useState({
     full_name: '',
     email: '',
     phone: '',
@@ -46,19 +57,33 @@ export default function UserSettings() {
       const { data, error } = await getCurrentUserProfile()
       if (error) throw error
 
-      setProfileData({
+      const userData = {
         full_name: data.full_name || '',
         email: data.email || '',
         phone: data.phone || '',
         department: data.department || '',
         employee_id: data.employee_id || ''
-      })
+      }
+
+      setProfileData(userData)
+      setOriginalProfileData(userData) // Store original for cancel
     } catch (err) {
       logger.error('Error loading profile:', err)
       setError('Failed to load profile')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleEditProfile = () => {
+    setIsEditingProfile(true)
+    setError('')
+  }
+
+  const handleCancelEditProfile = () => {
+    setIsEditingProfile(false)
+    setProfileData(originalProfileData) // Revert to original data
+    setError('')
   }
 
   const handleProfileSubmit = async (e) => {
@@ -72,6 +97,8 @@ export default function UserSettings() {
       if (error) throw error
 
       setSuccess('Profile updated successfully')
+      setIsEditingProfile(false)
+      setOriginalProfileData(profileData) // Update original data after successful save
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       logger.error('Error updating profile:', err)
@@ -208,7 +235,10 @@ export default function UserSettings() {
                       required
                       value={profileData.full_name}
                       onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={!isEditingProfile}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        !isEditingProfile ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -220,7 +250,7 @@ export default function UserSettings() {
                       type="email"
                       value={profileData.email}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
                     />
                     <p className="text-xs text-gray-500 mt-1">Email cannot be changed here</p>
                   </div>
@@ -233,7 +263,10 @@ export default function UserSettings() {
                       type="tel"
                       value={profileData.phone}
                       onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={!isEditingProfile}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        !isEditingProfile ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -245,7 +278,10 @@ export default function UserSettings() {
                       type="text"
                       value={profileData.department}
                       onChange={(e) => setProfileData({ ...profileData, department: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={!isEditingProfile}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        !isEditingProfile ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -257,26 +293,40 @@ export default function UserSettings() {
                       type="text"
                       value={profileData.employee_id}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed text-gray-500"
                     />
                   </div>
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4 border-t">
-                  <button
-                    type="button"
-                    onClick={() => navigate(-1)}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-                  >
-                    {saving ? 'Saving...' : 'Save Changes'}
-                  </button>
+                  {!isEditingProfile ? (
+                    <button
+                      type="button"
+                      onClick={handleEditProfile}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit Profile
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleCancelEditProfile}
+                        disabled={saving}
+                        className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:bg-gray-100"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:bg-gray-400"
+                      >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </>
+                  )}
                 </div>
               </form>
             )}
