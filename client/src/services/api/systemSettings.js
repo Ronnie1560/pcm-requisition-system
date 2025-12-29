@@ -7,12 +7,27 @@ import { logger } from '../../utils/logger'
 
 /**
  * Get organization settings
+ * Optimized to select only required fields for better performance
  */
 export const getOrganizationSettings = async () => {
   try {
     const { data, error } = await supabase
       .from('organization_settings')
-      .select('*')
+      .select(`
+        id,
+        organization_name,
+        address_line1,
+        address_line2,
+        city,
+        state_province,
+        postal_code,
+        country,
+        phone,
+        email,
+        website,
+        tax_id,
+        logo_url
+      `)
       .single()
 
     if (error) throw error

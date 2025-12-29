@@ -460,10 +460,43 @@ export default function SystemSettings() {
           </div>
 
           <div className="p-6">
-            {/* Loading State */}
+            {/* Loading State with Skeleton */}
             {isLoadingCurrentTab ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="text-gray-600">Loading {activeTab} settings...</div>
+              <div className="space-y-6 animate-pulse">
+                {/* Skeleton for Organization tab */}
+                {activeTab === 'organization' && (
+                  <>
+                    {/* Logo skeleton */}
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                      <div className="h-6 bg-gray-300 rounded w-48 mb-4"></div>
+                      <div className="flex items-start gap-6">
+                        <div className="w-32 h-32 bg-gray-300 rounded-lg"></div>
+                        <div className="flex-1 space-y-3">
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                          <div className="h-10 bg-gray-300 rounded w-32"></div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Form fields skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {[...Array(8)].map((_, i) => (
+                        <div key={i} className={i === 0 ? 'md:col-span-2' : ''}>
+                          <div className="h-4 bg-gray-300 rounded w-32 mb-2"></div>
+                          <div className="h-10 bg-gray-200 rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {/* Skeleton for other tabs */}
+                {activeTab !== 'organization' && (
+                  <div className="space-y-4">
+                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
+                  </div>
+                )}
               </div>
             ) : (
               <>

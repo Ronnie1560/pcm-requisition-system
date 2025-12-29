@@ -46,15 +46,25 @@ export const useOrganizationSettings = () => {
   // Function to fetch organization settings
   const fetchSettings = useCallback(async (forceRefresh = false) => {
     try {
-      // If we have valid cache and not forcing refresh, use it
-      if (!forceRefresh && isCacheValid()) {
+      // OPTIMIZATION: Return cached data immediately (stale-while-revalidate)
+      // This provides instant loading while fetching fresh data in background
+      const hasCache = cachedSettings !== null
+      const isFresh = isCacheValid()
+
+      if (hasCache && !forceRefresh) {
+        // Immediately set cached data (even if stale)
         if (isMountedRef.current) {
           setOrgSettings(cachedSettings)
-          setLoading(false)
-          setError(null)
-          setIsCached(true)
+          setIsCached(!isFresh)
+          // Only show loading if cache is stale
+          if (isFresh) {
+            setLoading(false)
+            setError(null)
+            console.log('[useOrganizationSettings] Using fresh cache (instant load)')
+            return cachedSettings
+          }
+          console.log('[useOrganizationSettings] Using stale cache, refreshing in background')
         }
-        return cachedSettings
       }
 
       // Deduplicate: if request is already pending, wait for it instead of making new request
@@ -69,9 +79,13 @@ export const useOrganizationSettings = () => {
         return result
       }
 
-      // Create new request
-      console.log('[useOrganizationSettings] Fetching fresh data from API')
-      setLoading(true)
+      // Create new request (background refresh if we showed stale cache)
+      if (!hasCache) {
+        console.log('[useOrganizationSettings] No cache, fetching fresh data from API')
+        setLoading(true)
+      } else {
+        console.log('[useOrganizationSettings] Refreshing stale cache in background')
+      }
       setError(null)
 
       // Store promise for deduplication
