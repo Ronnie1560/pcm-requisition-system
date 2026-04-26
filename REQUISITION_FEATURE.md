@@ -15,8 +15,7 @@ The requisition creation workflow is now complete and production-ready!
 - ✅ `getUserRequisitions()` - Fetch user's requisitions with filters
 - ✅ `getRequisitionById()` - Get single requisition with all details
 - ✅ `getUserProjects()` - Get user's assigned projects
-- ✅ `getProjectAccounts()` - Get expense accounts for a project
-- ✅ `getAccountItems()` - Get approved items for an account
+- ✅ `getAllExpenseAccounts()` - Get expense accounts (filtered by project)
 - ✅ `getUomTypes()` - Get all units of measure
 - ✅ `createRequisition()` - Create new requisition
 - ✅ `updateRequisition()` - Update requisition
@@ -73,7 +72,6 @@ The requisition creation workflow is now complete and production-ready!
   - Modal dialog with search
   - Search by name, code, or category
   - Shows item details and preferred price
-  - Filtered by project account
 
 - ✅ **Line Item Management:**
   - Add items from catalog
@@ -236,13 +234,8 @@ When unit price differs >10% from preferred price:
 4. **projects**
    - User's assigned projects
 
-5. **project_accounts**
-   - Expense accounts per project
-   - Budget tracking
-
-6. **account_items**
-   - Pre-approved items with preferred pricing
-   - Quantity limits
+5. **expense_accounts**
+   - Chart of accounts for expense categorization
 
 7. **items**
    - Master item catalog
