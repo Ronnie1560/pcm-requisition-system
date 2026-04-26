@@ -196,14 +196,15 @@ const RequisitionDetail = () => {
     const status = requisition.status
     const isOwnRequisition = requisition.submitted_by === user.id
 
+    // ALL ROLES (including Super Admin) are restricted from self-approval
+    // to maintain the "four-eyes" principle for all financial transactions.
+    if (isOwnRequisition) {
+      return false
+    }
+
     // Super admin can approve at any stage
     if (isAdmin) {
       return status === 'reviewed' || status === 'pending' || status === 'under_review'
-    }
-
-    // Approvers cannot approve their own requisitions (conflict of interest)
-    if (isOwnRequisition && hasApproverRole) {
-      return false
     }
 
     // Regular approvers can only approve reviewed requisitions
